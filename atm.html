@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesin ATM Sederhana</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .atm {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .atm h2 {
+      text-align: center;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    input, button, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #238636;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2ea043;
+    }
+    #menu, #transaksi {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="atm">
+  <div id="login">
+    <h2>Masukkan PIN</h2>
+    <div class="input-group">
+      <input type="password" id="pinInput" placeholder="PIN">
+    </div>
+    <button onclick="cekPIN()">Login</button>
+    <p id="loginMsg"></p>
+  </div>
+
+  <div id="menu">
+    <h2>Menu ATM</h2>
+    <button onclick="showSaldo()">Cek Saldo</button><br><br>
+    <button onclick="showSetor()">Setor Tunai</button><br><br>
+    <button onclick="showTarik()">Tarik Tunai</button><br><br>
+    <button onclick="logout()">Keluar</button>
+    <p id="saldoInfo"></p>
+  </div>
+
+  <div id="transaksi">
+    <h2 id="transaksiTitle"></h2>
+    <div class="input-group">
+      <input type="number" id="amountInput" placeholder="Masukkan jumlah">
+    </div>
+    <button onclick="prosesTransaksi()">Proses</button><br><br>
+    <button onclick="backToMenu()">Batal</button>
+  </div>
+</div>
+
+<script>
+  let saldo = 100000;
+  let pin = "170408";
+  let percobaan = 0;
+  let mode = "";
+
+  function cekPIN() {
+    const input = document.getElementById("pinInput").value;
+    if (input === pin) {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("menu").style.display = "block";
+    } else {
+      percobaan++;
+      document.getElementById("loginMsg").innerText = `PIN salah. Percobaan ${percobaan}/3`;
+      if (percobaan >= 3) {
+        alert("PIN salah 3 kali. ATM diblokir.");
+        location.reload();
+      }
+    }
+  }
+
+  function showSaldo() {
+    document.getElementById("saldoInfo").innerText = `Saldo Anda: Rp ${saldo.toLocaleString()}`;
+  }
+
+  function showSetor() {
+    mode = "setor";
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("transaksi").style.display = "block";
+    document.getElementById("transaksiTitle").innerText = "Setor Tunai";
+  }
+
+  function showTarik() {
+    mode = "tarik";
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("transaksi").style.display = "block";
+    document.getElementById("transaksiTitle").innerText = "Tarik Tunai";
+  }
+
+  function prosesTransaksi() {
+    const amount = parseInt(document.getElementById("amountInput").value);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Masukkan jumlah yang valid.");
+      return;
+    }
+    if (mode === "setor") {
+      saldo += amount;
+      alert(`Setor berhasil! Saldo baru: Rp ${saldo.toLocaleString()}`);
+    } else if (mode === "tarik") {
+      if (amount > saldo) {
+        alert("Saldo tidak cukup!");
+      } else {
+        saldo -= amount;
+        alert(`Tarik berhasil! Saldo baru: Rp ${saldo.toLocaleString()}`);
+      }
+    }
+    backToMenu();
+  }
+
+  function backToMenu() {
+    document.getElementById("transaksi").style.display = "none";
+    document.getElementById("menu").style.display = "block";
+    document.getElementById("amountInput").value = "";
+  }
+
+  function logout() {
+    if (confirm("Yakin mau keluar?")) {
+      location.reload();
+    }
+  }
+</script>
+
+</body>
+</html>
